@@ -1,0 +1,96 @@
+base_model: /workspace/models/Mixtral-8x7B-v0.1
+model_type: MixtralForCausalLM
+tokenizer_type: LlamaTokenizer
+is_mistral_derived_model: false
+
+load_in_8bit: false
+load_in_4bit: true
+strict: false
+
+model_config:
+  output_router_logits: true
+
+datasets:
+  - path: /workspace/datasets/dolphin/dolphin201.jsonl
+    type: alpaca_w_system.load_open_orca_chatml
+  - path: /workspace/datasets/Synthia-converted.jsonl
+    type: alpaca_w_system.load_open_orca_chatml
+  - path: /workspace/datasets/dolphin-coder-translate.jsonl
+    type: alpaca_w_system.load_open_orca_chatml
+  - path: /workspace/datasets/dolphin-coder-codegen.jsonl
+    type: alpaca_w_system.load_open_orca_chatml
+  - path: /workspace/datasets/data-evol_instruct-decontaminated-converted.jsonl
+    type: alpaca_w_system.load_open_orca_chatml
+  - path: /workspace/datasets/data-oss_instruct-decontaminated-converted.jsonl
+    type: alpaca_w_system.load_open_orca_chatml
+  - path: /workspace/datasets/Pure-Dove-converted.jsonl
+    type: sharegpt
+    conversation: chatml
+  - path: teknium/openhermes
+    type: alpaca
+    prompt_style: chatml
+
+dataset_prepared_path:
+val_set_size: 0
+output_dir: /workspace/dolphin-mixtral-8x7b
+resume_from_checkpoint:
+hf_use_auth_token:
+
+adapter:  qlora
+lora_model_dir:
+
+sequence_len: 16384
+sample_packing: true
+pad_to_sequence_len: true
+
+lora_r: 32
+lora_alpha: 16
+lora_dropout: 0.05
+lora_target_modules:
+lora_target_linear: true
+lora_fan_in_fan_out:
+lora_modules_to_save:
+  - embed_tokens
+  - lm_head
+
+wandb_project: dolphin
+wandb_entity: 
+wandb_watch:
+wandb_run_id: 
+wandb_log_model:
+
+gradient_accumulation_steps: 2
+micro_batch_size: 3
+num_epochs: 3
+optimizer: paged_adamw_8bit
+lr_scheduler: cosine
+learning_rate: 0.0002
+
+train_on_inputs:
+group_by_length: false
+bf16: true
+fp16: false
+tf32: false
+
+gradient_checkpointing: true
+early_stopping_patience:
+local_rank:
+logging_steps: 1
+xformers_attention:
+flash_attention: true
+
+warmup_steps: 100
+eval_steps: 
+save_steps: 0.01
+save_total_limit: 2
+eval_sample_packing:
+debug:
+deepspeed: deepspeed/zero2.json
+weight_decay: 0.05
+fsdp:
+fsdp_config:
+special_tokens:
+  eos_token: "<|im_end|>"
+tokens:
+  - "<|im_start|>"
+trust_remote_code: true
